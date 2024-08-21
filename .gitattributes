@@ -1,0 +1,9 @@
+# Treat everything as binary (not text) by default
+* binary
+*.html binary
+
+# Force-ignore HTML and CSS files
+*.html linguist-language=none linguist-vendored=true linguist-generated=true linguist-documentation=true
+*.htm linguist-language=none linguist-vendored=true linguist-generated=true linguist-documentation=true
+*.css linguist-language=none linguist-vendored=true linguist-generated=true linguist-documentation=true
+*.ejs linguist-language=none linguist-vendored=true linguist-generated=true linguist-documentation=true
