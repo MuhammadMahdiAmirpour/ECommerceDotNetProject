@@ -1,0 +1,6 @@
+﻿services:
+  myecommerce:
+    image: myecommerce
+    build:
+      context: .
+      dockerfile: MyECommerce/Dockerfile
