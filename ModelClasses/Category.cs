@@ -7,7 +7,7 @@ public class Category {
 	[Key]
 	public int    Id   { get; set; }
 	
-	[Required]
 	[StringLength(30, ErrorMessage = "Length of above 30 characters is not allowed")]
-	public required string Name { get; set; }
+	[Required(ErrorMessage = "Name is required")]
+	public required string? Name { get; set; }
 }

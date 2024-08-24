@@ -1,0 +1,121 @@
+@model ModelClasses.ViewModel.RegisterVm
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="row p-5">
+        <h3 class="text-center fw-bold readable-text"><strong>Register Form</strong></h3>
+        <div class="col-12 border-2 border-success" style="border:solid">
+            <form asp-action="Register" asp-controller="Account" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger readable-text"></div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="ApplicationUser!.FirstName" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="ApplicationUser!.FirstName" class="form-control"></input>
+                        <span asp-validation-for="ApplicationUser!.FirstName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="ApplicationUser!.LastName" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="ApplicationUser!.LastName" class="form-control"/>
+                        <span asp-validation-for="ApplicationUser!.LastName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="UserName" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="UserName" class="form-control"/>
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="Email" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="Email" class="form-control"/>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="ApplicationUser!.Address" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="ApplicationUser!.Address" class="form-control"></input>
+                        <span asp-validation-for="ApplicationUser!.Address" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="ApplicationUser!.State" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="ApplicationUser!.State" class="form-control"/>
+                        <span asp-validation-for="ApplicationUser!.State" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="ApplicationUser!.City" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="ApplicationUser!.City" class="form-control" placeholder="City"/>
+                        <span asp-validation-for="ApplicationUser!.City" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="ApplicationUser!.County" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="ApplicationUser!.County" class="form-control" placeholder="County"/>
+                        <span asp-validation-for="ApplicationUser!.County" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="ApplicationUser!.PostalCode" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="ApplicationUser!.PostalCode" class="form-control" placeholder="PostalCode"/>
+                        <span asp-validation-for="ApplicationUser!.PostalCode" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="Password" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="Password" class="form-control" placeholder="ex-12PD# not less than 8"/>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <strong><label asp-for="ConfirmPassword" class="readable-text"></label></strong>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-12">
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Use the same pass"/>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+                <input asp-for="StatusMessage" type="hidden"/>
+                <div class="p-2">
+                    <button type="submit" class="btn btn-light btn-outline-danger form-control text-dark">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

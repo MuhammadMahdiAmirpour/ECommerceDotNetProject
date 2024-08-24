@@ -1,0 +1,12 @@
+@model ModelClasses.ViewModel.RegisterVm
+@{
+    ViewData["Title"] = "Registration Confirmation";
+}
+
+<h1>@ViewData["Title"]</h1>
+<h4>Thank you for registering!</h4>
+<p>
+    Please check your email to confirm your registration.
+    If you did not receive an email, <a asp-action="ResendConfirmationEmail" asp-route-email="@Model">click here</a> to resend the confirmation email.
+</p>
+<p>@Model.StatusMessage</p>

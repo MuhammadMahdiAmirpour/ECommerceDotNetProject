@@ -1,0 +1,24 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model ModelClasses.ViewModel.ResendConfirmationEmailVm
+
+@{
+    ViewData["Title"] = "Resend Email Confirmation";
+}
+
+<h1>@ViewData["Title"]</h1>
+<h4>Enter your email to resend the confirmation link.</h4>
+<hr/>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ResendConfirmationEmail" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" class="form-control"/>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Resend</button>
+        </form>
+        <a asp-action="Login">Back to Login</a>
+    </div>
+</div>

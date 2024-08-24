@@ -1,22 +1,236 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
+/* Global Styles */
 body {
-  margin-bottom: 60px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f4; /* Light background for contrast */
+    color: #333; /* Dark text for readability */
+    padding: 0;
+    height: 100%; /* Full viewport height */
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 60px;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+    padding: 0;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    z-index: 1; /* Place overlay below the content */
+}
+
+/* Card Styles */
+.login-card {
+    position: relative;
+    z-index: 2; /* Ensure the card is above the overlay */
+    max-width: 500px; /* Set max width for the card */
+    margin: auto; /* Center the card */
+    padding: 20px; /* Add some padding to the card */
+    border-radius: 8px; /* Add rounded corners to the card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the card */
+}
+
+/* Readable Text Effect */
+.readable-text {
+    color: #f0f0f0; /* Light gray text for visibility */
+    text-shadow:
+            0 0 3px rgba(0, 0, 0, 0.7), /* Black shadow for contrast */
+            0 0 5px rgba(0, 0, 0, 0.5); /* Larger shadow for more glow */
+}
+
+/* Danger Text */
+.text-danger {
+    color: #dc3545; /* Danger color */
+}
+
+/* Background Image */
+.background-image {
+    background-image: url('/images/thaBG.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    position: relative;
+    z-index: 1;
+}
+
+/* Overlay for Background */
+.background-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    z-index: 1; /* Place overlay below the content */
+}
+
+.row {
+    position: relative;
+    z-index: 2;
+}
+
+/* Footer Styles */
+.footer {
+    background-color: #f8f9fa;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+}
+
+/* Flexbox for Full Height */
+.d-flex {
+    display: flex;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.min-vh-100 {
+    min-height: 100vh; /* Minimum height of 100% of the viewport */
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-grow-1 {
+    flex-grow: 1; /* Allow the login container to grow */
+}
+
+/* Container Styles */
+.container {
+    max-width: 1200px; /* Maximum width for larger screens */
+    margin: 0 auto; /* Center the container */
+    padding: 20px; /* Padding around the container */
+}
+
+/* Padding Classes */
+.PaddingAll {
+    padding: 30px; /* Increased padding for sections */
+}
+
+.PaddingAllWhite {
+    background-color: #ffffff; /* White background for contrast */
+    padding: 30px;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Headings */
+h2 {
+    font-size: 2rem; /* Larger heading */
+    color: #007bff; /* Primary color for headings */
+    margin-bottom: 20px; /* Space below heading */
+}
+
+h4 {
+    font-size: 1.5rem; /* Medium heading */
+    color: #555; /* Darker gray for subheadings */
+}
+
+/* Text Color Classes */
+.text-info {
+    color: #17a2b8; /* Info color */
+}
+
+.text-danger {
+    color: #dc3545; /* Danger color */
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px; /* Space between form groups */
+}
+
+label {
+    font-weight: bold; /* Bold labels */
+    margin-bottom: 5px; /* Space below labels */
+}
+
+/* Input Styles */
+input[type="text"],
+input[type="submit"],
+input[type="button"],
+select,
+textarea {
+    width: 100%; /* Full width for inputs */
+    padding: 10px; /* Padding inside inputs */
+    border: 1px solid #ced4da; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    transition: border-color 0.3s; /* Smooth border color transition */
+}
+
+input[type="text"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #007bff; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for buttons */
+    font-size: 1rem; /* Font size for buttons */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Bootstrap primary color */
+    border: none; /* Remove border */
+    color: white; /* White text */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+.btn-secondary {
+    background-color: #6c757d; /* Bootstrap secondary color */
+    border: none;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268; /* Darker shade on hover */
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+.btn-success {
+    background-color: #28a745; /* Success color */
+    border: none;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838; /* Darker shade on hover */
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .col-1, .col-3, .col-9 {
+        flex: 0 0 100%; /* Stack columns on small screens */
+        max-width: 100%;
+    }
+
+    .col-10 {
+        flex: 0 0 100%; /* Full width for the main column */
+        max-width: 100%;
+    }
+
+    .form-group {
+        margin-bottom: 15px; /* Reduced space on smaller screens */
+    }
 }
