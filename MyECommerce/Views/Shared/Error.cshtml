@@ -1,4 +1,4 @@
-﻿@model ModelClasses.ViewModel.ErrorVm;
+﻿@model ModelClasses.ViewModel.ErrorVm
 @{
     ViewData["Title"] = "Error";
 }
@@ -10,6 +10,16 @@
     <p>
         <strong>Request ID:</strong> <code>@Model.RequestId</code>
     </p>
+}
+
+@if (!string.IsNullOrEmpty(Model.CustomErrorMessage)) {
+    <p>@Model.CustomErrorMessage</p>
+}
+
+@if (Model.ShowExceptionDetails) {
+    <h3>Exception Details:</h3>
+    <p>@Model.ExceptionMessage</p>
+    <pre>@Model.StackTrace</pre>
 }
 
 <h3>Development Mode</h3>

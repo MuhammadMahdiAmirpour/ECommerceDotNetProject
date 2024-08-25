@@ -1,2 +1,8 @@
-<h1>Email Confirmation</h1>
-<p>Your email has been confirmed successfully!</p>
+@try {
+    <h2>Email Confirmed</h2>
+    <!-- Rest of your view content -->
+} catch (Exception ex) {
+    <h2>Error Rendering View</h2>
+    <p>@ex.Message</p>
+    <pre>@ex.StackTrace</pre>
+}

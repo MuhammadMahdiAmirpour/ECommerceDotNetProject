@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -115,7 +116,7 @@ public class AccountController(SignInManager<ApplicationUser> signInManager, Use
 				var callbackUrl = Url.Action(
 				"ConfirmEmail",
 				"Account",
-				new { userId = user.Id, code = code },
+				new { userId = user.Id, code },
 				protocol: HttpContext.Request.Scheme);
 
 				if (user.Email != null)
@@ -134,28 +135,56 @@ public class AccountController(SignInManager<ApplicationUser> signInManager, Use
 		return View(register);
 	}
 
-	// [HttpGet]
-	// [AllowAnonymous]
-	// public async Task<IActionResult> ConfirmEmail(string? userId, string? code) {
-	// 	if (userId == null || code == null) return RedirectToAction("Index", "Home");
-	// 	var user = await userManager.FindByIdAsync(userId);
-	// 	if (user == null) return NotFound($"Unable to load user with ID '{userId}'.");
-	// 	var result = await userManager.ConfirmEmailAsync(user, code);
-	// 	if (!result.Succeeded) throw new InvalidOperationException($"Error confirming email for user with ID '{userId}':");
-	// 	return View("ConfirmEmail");
-	// }
-
-
 	[HttpGet]
+	[AllowAnonymous]
 	public async Task<IActionResult> ConfirmEmail(string? userId, string? code) {
-		if (userId == null || code == null) return RedirectToAction("Index", "Home");
-		var user = await userManager.FindByIdAsync(userId);
-		if (user == null) return NotFound($"Unable to load user with ID '{userId}'.");
-		var result = await userManager.ConfirmEmailAsync(user, code);
-		if (!result.Succeeded) return View("Error");
-		user.EmailConfirmationDate = DateTime.UtcNow; // Set the confirmation date
-		await userManager.UpdateAsync(user);          // Update the user in the database
-		return View("ConfirmEmail");
+		try {
+			logger.LogInformation("ConfirmEmail action called with userId: {UserId} and code: {Code}", userId, code);
+			if (userId == null || code == null) {
+				logger.LogWarning("ConfirmEmail called with null userId or code");
+				return View("Error", new ErrorVm {
+					CustomErrorMessage = "Invalid confirmation link."
+				});
+			}
+
+			var user = await userManager.FindByIdAsync(userId);
+			if (user == null) {
+				logger.LogWarning("Unable to load user with ID '{UserId}' for email confirmation", userId);
+				return View("Error", new ErrorVm {
+					CustomErrorMessage = "User not found."
+				});
+			}
+
+			var result = await userManager.ConfirmEmailAsync(user, code);
+			if (!result.Succeeded) {
+				var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+				logger.LogError("Error confirming email for user ID '{UserId}': {Errors}", userId, errors);
+				return View("Error", new ErrorVm {
+					CustomErrorMessage   = "Error confirming email.",
+					ExceptionMessage     = errors,
+					ShowExceptionDetails = true
+				});
+			}
+
+			user.EmailConfirmationDate = DateTime.UtcNow;
+			var updateResult = await userManager.UpdateAsync(user);
+			if (!updateResult.Succeeded) {
+				var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+				logger.LogError("Error updating user after email confirmation for user ID '{UserId}': {Errors}", userId, errors);
+				// Continue to confirmation view despite update error
+			}
+
+			logger.LogInformation("Email confirmed for user ID '{UserId}'", userId);
+			return View("ConfirmEmail");
+		} catch (Exception ex) {
+			logger.LogError(ex, "Unhandled exception in ConfirmEmail action");
+			return View("Error", new ErrorVm {
+				RequestId            = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+				ExceptionMessage     = ex.Message,
+				StackTrace           = ex.StackTrace,
+				ShowExceptionDetails = true
+			});
+		}
 	}
 
 	[HttpGet]
@@ -186,7 +215,7 @@ public class AccountController(SignInManager<ApplicationUser> signInManager, Use
 			var callbackUrl = Url.Action(
 			"ConfirmEmailChange",
 			"Account",
-			new { userId = userId, email = model.NewEmail, code = code },
+			new { userId, email = model.NewEmail, code },
 			protocol: HttpContext.Request.Scheme);
 			if (callbackUrl != null)
 				await emailSender.SendEmailAsync(
@@ -225,43 +254,11 @@ public class AccountController(SignInManager<ApplicationUser> signInManager, Use
 		return View("ConfirmEmailChange");
 	}
 
-	// [HttpPost]
-	// [AllowAnonymous]
-	// [ValidateAntiForgeryToken]
-	// public async Task<IActionResult> ResendEmailConfirmation(string email) {
-	// 	if (string.IsNullOrEmpty(email)) return View();
-	//
-	// 	var user = await userManager.FindByEmailAsync(email);
-	// 	if (user == null) {
-	// 		ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
-	// 		return View();
-	// 	}
-	//
-	// 	var userId = await userManager.GetUserIdAsync(user);
-	// 	var code   = await userManager.GenerateEmailConfirmationTokenAsync(user);
-	// 	var callbackUrl = Url.Action(
-	// 	"ConfirmEmail",
-	// 	"Account",
-	// 	new { userId = userId, code = code },
-	// 	protocol: HttpContext.Request.Scheme);
-	// 	if (callbackUrl != null)
-	// 		await emailSender.SendEmailAsync(
-	// 		email,
-	// 		"Confirm your email",
-	// 		$"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-	//
-	// 	ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
-	// 	return View();
-	// }
-
-
 	[HttpPost]
 	[ValidateAntiForgeryToken]
 	public async Task<IActionResult> Logout(string? returnUrl = null) {
 		await signInManager.SignOutAsync();
-		if (returnUrl != null) {
-			return LocalRedirect(returnUrl);
-		}
+		if (returnUrl != null) return LocalRedirect(returnUrl);
 		return RedirectToAction("Index", "Home");
 	}
 	public IActionResult ResendConfirmationEmail(string email) =>
@@ -270,20 +267,51 @@ public class AccountController(SignInManager<ApplicationUser> signInManager, Use
 
 	[HttpPost]
 	[ValidateAntiForgeryToken]
+	[AllowAnonymous]
 	public async Task<IActionResult> ResendConfirmationEmail(ResendConfirmationEmailVm model) {
-		if (!ModelState.IsValid) return View(model);
+		try {
+			logger.LogInformation("Attempting to resend confirmation email for: {Email}", model.Email);
 
-		var user = await userManager.FindByEmailAsync(model.Email);
-		if (user == null) {
-			logger.LogWarning("Attempted to resend confirmation email to non-existent user: {Email}", model.Email);
-			return RedirectToAction("Login"); // Redirect to login if user does not exist
+			if (!ModelState.IsValid) {
+				logger.LogWarning("Invalid model state for email: {Email}", model.Email);
+				return View(model);
+			}
+
+			var user = await userManager.FindByEmailAsync(model.Email);
+			if (user == null) {
+				logger.LogWarning("Attempted to resend confirmation email to non-existent user: {Email}", model.Email);
+				return RedirectToAction("Login", new { Message = "If an account exists with this email, a confirmation email has been sent." });
+			}
+
+			var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+			logger.LogDebug("Generated confirmation token for user: {Email}", model.Email);
+
+			var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code}, protocol: Request.Scheme);
+			logger.LogInformation("Generated callback URL: {CallbackUrl}", callbackUrl);
+			if (string.IsNullOrEmpty(callbackUrl)) {
+				logger.LogError("Failed to generate callback URL for user: {Email}", model.Email);
+				throw new InvalidOperationException("Failed to generate callback URL");
+			}
+
+			logger.LogDebug("Attempting to send confirmation email to: {Email}", model.Email);
+			await emailSender.SendEmailAsync(model.Email, "Confirm your email", $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
+
+			logger.LogInformation("Successfully resent confirmation email to user: {Email}", model.Email);
+			return RedirectToAction("Login", new { Message = "Confirmation email resent. Please check your inbox." });
+		} catch (Exception ex) {
+			logger.LogError(ex, "Error occurred while resending confirmation email for: {Email}", model.Email);
+
+			// Instead of redirecting to an error page, we'll return a view with the error details
+			var errorVm = new ErrorVm {
+				RequestId            = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+				ShowRequestId        = true,
+				CustomErrorMessage   = "An error occurred while sending the confirmation email. Please try again later.",
+				ExceptionMessage     = ex.Message,
+				StackTrace           = ex.StackTrace,
+				ShowExceptionDetails = true // Set this to false in production
+			};
+
+			return View("Error", errorVm);
 		}
-
-		var code        = await userManager.GenerateEmailConfirmationTokenAsync(user);
-		var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Scheme);
-		await emailSender.SendEmailAsync(model.Email, "Confirm your email", $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
-
-		logger.LogInformation("Resent confirmation email to user: {Email}", model.Email);
-		return RedirectToAction("Login", new { Message = "Confirmation email resent. Please check your inbox." });
 	}
 }

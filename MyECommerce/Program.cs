@@ -28,7 +28,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
-		options.SignIn.RequireConfirmedAccount = false;
+		options.SignIn.RequireConfirmedAccount = true;
 		options.SignIn.RequireConfirmedEmail   = true;
 	})
 	.AddEntityFrameworkStores<ApplicationDbContext>()
@@ -41,6 +41,8 @@ builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 // Add Razor Pages and MVC
 builder.Services.AddRazorPages();
 // builder.Services.AddControllersWithViews();
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(3));
 
 var app = builder.Build();
 
@@ -65,5 +67,22 @@ app.MapControllerRoute(
 name: "default",
 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.Use(async (context, next) => {
+	try {
+		await next();
+	} catch (Exception ex) {
+		// Log the error
+		var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+		logger.LogError(ex, "Unhandled exception");
+
+		// Re-throw the exception to be handled by the exception handler middleware
+		throw;
+	}
+});
+
+AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) => {
+	var logger = app.Services.GetRequiredService<ILogger<Program>>();
+	logger.LogCritical(eventArgs.ExceptionObject as Exception, "Unhandled exception");
+};
 
 app.Run();
